@@ -59,8 +59,9 @@ python3 scripts/recalc_fallback.py <workspace>/<name>_已填写.xlsx --write
 | `额外说明/` | notes for finance | plain‑text explainers: merges, partial refunds, rebookings, FX conversion, company‑paid/personal splits |
 | `过程文件/` | process | `身份信息.json`, `manifest.json`, `extracted/`, `物料台账.csv`, `ledger.json` |
 | `备份/` | backup | 1:1 backup of originals + `_模板原件/` |
+| `待核实/` | to‑verify | uncertain items park here — **don't** pre‑file into `有票`/`无票` until the user confirms |
 | `补充材料/` | supplements intake | drop later‑supplied materials here; backed up & re‑classified, then **emptied** |
-| `下一期/` | next period | items confirmed as next‑period / not‑claimed, kept aside, excluded from this run |
+| `无关/` | unrelated | items confirmed unrelated / not‑this‑period; kept aside, excluded from this run |
 
 …plus `<name>_已填写.xlsx` (the filled table, rows **in chronological order**) and `审阅报告.md` (summary + reconciliation + open questions).
 
@@ -122,8 +123,9 @@ python3 scripts/recalc_fallback.py <工作区>/<名称>_已填写.xlsx --write
 | `额外说明/` | 给财务看的说明 | 纯文本：合并、部分退费、改签、外币换算、企业代付/个人垫付拆分 |
 | `过程文件/` | 过程信息 | `身份信息.json`、`manifest.json`、`extracted/`、`物料台账.csv`、`ledger.json` |
 | `备份/` | 原件备份 | 原始材料 1:1 备份 + `_模板原件/` |
+| `待核实/` | 待核实 | 拿不准的先放这里，**别急着**进 `有票`/`无票`，用户确认后再移走 |
 | `补充材料/` | 补充材料入口 | 客户后续补的材料丢这里；备份并归桶后**自动清空** |
-| `下一期/` | 下一期 | 经确认属下期/本期不报的材料，单独存放、不计入本期 |
+| `无关/` | 无关 | 经确认与本次无关/本期不报/跨期的材料，单独存放、不计入本期 |
 
 …外加 `<名称>_已填写.xlsx`（填好的明细表，**按时间顺序排列**）和 `审阅报告.md`（汇总 + 勾稽 + 存疑清单）。
 
