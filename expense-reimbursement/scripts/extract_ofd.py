@@ -3,7 +3,7 @@
 从 OFD 文件提取文本 (OFD 是国标电子票据格式: 本质是 zip + XML)。
 
 用法:
-  python extract_ofd.py <file.ofd> [--json]
+  python3 extract_ofd.py <file.ofd> [--json]
 
 策略:
   - 解压 OFD, 遍历各页 Content.xml, 抽取 <TextCode> 内文本, 按出现顺序拼接。

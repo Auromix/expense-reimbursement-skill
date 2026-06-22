@@ -3,7 +3,7 @@
 把整理好的费用台账回填进【模板副本】(原模板绝不修改)。
 
 用法:
-  python fill_template.py --xlsx <模板副本.xlsx> --ledger <费用台账.json>
+  python3 fill_template.py --xlsx <模板副本.xlsx> --ledger <费用台账.json>
 
 费用台账 JSON 结构:
 {
@@ -32,7 +32,8 @@
 }
 
 字段优先级: 若给了 "列" 用之; 否则用 "类别" 查映射表。两者都缺则报错。
-回填后金额公式不会自动算出数值, 请随后运行 xlsx skill 的 recalc.py 重算。
+回填后金额公式不会自动算出数值, 请随后重算(首选 xlsx skill 的 recalc.py;
+无 LibreOffice 时用同目录 recalc_fallback.py)。脚本输出的 computed 已给出预期数值供核对。
 """
 import argparse, json, sys
 from copy import copy
