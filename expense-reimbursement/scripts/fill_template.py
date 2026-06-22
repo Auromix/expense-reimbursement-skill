@@ -86,12 +86,22 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--xlsx", required=True)
     ap.add_argument("--ledger", required=True)
+    ap.add_argument("--no-sort", action="store_true",
+                    help="不按时间排序(默认按 月/日 升序排, 因模板要求按时间顺序填写)")
     args = ap.parse_args()
 
     with open(args.ledger, encoding="utf-8") as f:
         data = json.load(f)
     ident = data.get("identity", {})
     items = data.get("items", [])
+
+    # 模板表头批注要求"按时间顺序依次填写"。默认按 (月,日) 稳定升序排序;
+    # 同日内保留 ledger 原顺序(可用此控制同日多笔的先后, 如先正票后退票)。
+    if not args.no_sort:
+        items = sorted(items, key=lambda it: (
+            it.get("月") if isinstance(it.get("月"), (int, float)) else 99,
+            it.get("日") if isinstance(it.get("日"), (int, float)) else 99,
+        ))
 
     wb = load_workbook(args.xlsx)
     ws = wb.active

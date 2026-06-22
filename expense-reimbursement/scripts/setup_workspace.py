@@ -17,7 +17,9 @@
 import argparse, hashlib, json, os, shutil, sys
 from datetime import datetime
 
-SUBFOLDERS = ["有票", "无票", "辅助材料", "额外说明", "过程文件", "备份"]
+SUBFOLDERS = ["有票", "无票", "辅助材料", "额外说明", "过程文件", "备份", "补充材料", "下一期"]
+# 补充材料: 客户后续补的材料先丢这里; 处理时备份进 备份/ 并归桶, 处理完应清空。
+# 下一期:   经确认属于下期/本期不报的材料, 单独存这里, 不计入本期台账与模板。
 
 def sha1_head(path, nbytes=1 << 20):
     h = hashlib.sha1()
