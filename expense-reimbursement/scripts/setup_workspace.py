@@ -35,15 +35,24 @@ def sha1_head(path, nbytes=1 << 20):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--source", required=True, help="原始材料文件夹")
-    ap.add_argument("--out", required=True, help="工作区根目录(会被创建)")
-    ap.add_argument("--template", default=None, help="报销模板 .xlsx (可选)")
+    ap.add_argument("--out", default=None,
+                    help="工作区根目录(可选)。不给则默认在原始材料文件夹旁边建一个"
+                         "有具体含义的名字: <原文件夹名>_报销整理_<YYYYMMDD>")
+    ap.add_argument("--template", default=None, help="报销模板 .xlsx (可选; 不给则后续用 make_default_table.py 生成默认明细表)")
     args = ap.parse_args()
 
     src = os.path.abspath(args.source)
-    out = os.path.abspath(args.out)
     if not os.path.isdir(src):
         print(f"ERROR: 原始材料文件夹不存在: {src}", file=sys.stderr); sys.exit(2)
-    if os.path.abspath(out).startswith(src + os.sep):
+
+    # --out 缺省: 在源文件夹的「父目录」(默认位置)下, 用有具体含义的名字新建工作区。
+    # 跨平台: 全程用 os.path / pathlib, 不依赖任何 mac/linux 专有命令或路径。
+    if args.out:
+        out = os.path.abspath(args.out)
+    else:
+        stamp = datetime.now().strftime("%Y%m%d")
+        out = os.path.join(os.path.dirname(src), f"{os.path.basename(src)}_报销整理_{stamp}")
+    if os.path.abspath(out) == src or os.path.abspath(out).startswith(src + os.sep):
         print("ERROR: 工作区不能建在原始材料文件夹内部, 以免污染原件", file=sys.stderr); sys.exit(2)
 
     # 不算作"材料"、不应进备份的文件: 报销模板本身、skill 包、说明文档等

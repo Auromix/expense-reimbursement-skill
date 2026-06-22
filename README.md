@@ -46,18 +46,23 @@ Real reimbursement folders are a minefield: a VAT invoice **plus** its payment s
 | 3 | Build the item ledger | `过程文件/物料台账.csv` — one row per **material** (the single source of truth) |
 | 4 | Copy + rename + file | `日期_费用类型_关键信息_金额`; same event keeps the same name across folders |
 | 5 | Write finance notes | `额外说明/` txt for merges / refunds / FX / splits |
-| 6 | De‑dup → ledger → fill → recalc | collapse to **one row per event**, sort **chronologically**, `fill_template.py` then recalc; three‑way total must match |
+| 6 | De‑dup → ledger → fill → recalc | collapse to **one row per event**, sort **chronologically**, `fill_template.py` then recalc; three‑way total must match. **No template → `make_default_table.py`** generates a default 费用明细表 (xlsx+md) |
 | 7 | Review report + deliver | `审阅报告.md` with category totals, reconciliation, open‑questions list |
 
 **Minimal commands**
 ```bash
 cd expense-reimbursement
-python3 scripts/setup_workspace.py --source <materials> --out <workspace> --template <template.xlsx>
+# --out & --template are OPTIONAL: no --out → a meaningfully-named workspace next to the source;
+# no --template → the no-template branch (different users may have different templates, or none)
+python3 scripts/setup_workspace.py --source <materials> [--out <workspace>] [--template <template.xlsx>]
 python3 scripts/extract_ofd.py <file.ofd> --json          # OFD national e-invoices -> text
+# WITH a template:
 python3 scripts/fill_template.py --xlsx <workspace>/<name>_已填写.xlsx --ledger <workspace>/过程文件/ledger.json
 python3 scripts/recalc_fallback.py <workspace>/<name>_已填写.xlsx --write   # if no LibreOffice/recalc.py
+# WITHOUT a template — generate a default 费用明细表 (xlsx + md):
+python3 scripts/make_default_table.py --ledger <workspace>/过程文件/ledger.json --out <workspace>/<meaningful-name>.xlsx
 ```
-`fill_template.py` prints a `computed` block (per‑column subtotals + grand total) so you know the right numbers **without** LibreOffice, and auto‑sorts rows by date.
+`fill_template.py` prints a `computed` block (per‑column subtotals + grand total) so you know the right numbers **without** LibreOffice, and auto‑sorts rows by date. All scripts are pure `python3` + `openpyxl`/stdlib — **cross‑platform (macOS / Linux / Windows)**, no system‑specific commands.
 
 **Three adjustable defaults** (the user can change with one sentence): **autonomy** (default: *ask only when unsure*) · **identity** (default: *ask once, save to `身份信息.json`, reuse*) · **multi‑currency** (default: *convert to RMB; if no rate is given, ask — don't guess*).
 
@@ -86,7 +91,9 @@ python3 scripts/recalc_fallback.py <workspace>/<name>_已填写.xlsx --write   #
 - **Foreign currency** → convert to RMB with a stated rate/source; if no rate, **ask**.
 - **Suspected personal / unrelated** → `待核实/` then `无关/`; excluded by default, surfaced for the user.
 - **替票 never converts 无票 into 有票** and is never added to the totals.
-- **Chronological order** — the template requires rows in date order.
+- **Annual (包年) subscriptions → prorate monthly** (annual ÷ 12) when reimbursed monthly; a forgotten earlier month can be back‑filled.
+- **No template? No problem** — `make_default_table.py` emits a generic 费用明细表; workspaces get **meaningful auto‑names** next to the source; everything is **cross‑platform**.
+- **Chronological order** — rows go in date order.
 
 ### 📦 Install
 **A. Drop‑in folder (Claude Code / most agent runtimes):**
@@ -124,18 +131,22 @@ cp -R expense-reimbursement-skill/expense-reimbursement ~/.claude/skills/
 | 3 | 建物料台账 | `过程文件/物料台账.csv`——每份**材料**一行（唯一数据源） |
 | 4 | 复制 + 重命名 + 归桶 | `日期_费用类型_关键信息_金额`；同事件跨桶同名 |
 | 5 | 写额外说明 | `额外说明/` txt：合并 / 退费 / 外币 / 拆分 |
-| 6 | 去重→ledger→回填→重算 | 折叠成**一事件一行**、按**时间顺序**排、`fill_template.py` 后重算；三方总额一致 |
+| 6 | 去重→ledger→回填→重算 | 折叠成**一事件一行**、按**时间顺序**排、`fill_template.py` 后重算；三方总额一致。**无模板→ `make_default_table.py`** 生成通用费用明细表（xlsx+md） |
 | 7 | 审阅报告 + 交付 | `审阅报告.md`：分类汇总、勾稽核对、存疑清单 |
 
 **最小命令**
 ```bash
 cd expense-reimbursement
-python3 scripts/setup_workspace.py --source <材料文件夹> --out <工作区> --template <模板.xlsx>
+# --out 与 --template 都可不给：不给 --out → 在源旁边建有含义名字的工作区；不给 --template → 走无模板分支
+python3 scripts/setup_workspace.py --source <材料文件夹> [--out <工作区>] [--template <模板.xlsx>]
 python3 scripts/extract_ofd.py <file.ofd> --json          # OFD 国标电子发票 -> 文本
+# 有模板：
 python3 scripts/fill_template.py --xlsx <工作区>/<名称>_已填写.xlsx --ledger <工作区>/过程文件/ledger.json
 python3 scripts/recalc_fallback.py <工作区>/<名称>_已填写.xlsx --write   # 没有 LibreOffice/recalc.py 时
+# 无模板 —— 生成通用费用明细表（xlsx + md）：
+python3 scripts/make_default_table.py --ledger <工作区>/过程文件/ledger.json --out <工作区>/<有含义的名字>.xlsx
 ```
-`fill_template.py` 会输出 `computed`（各列小计 + 总额），**无需 LibreOffice** 即可知道正确数值，并自动按日期排序。
+`fill_template.py` 会输出 `computed`（各列小计 + 总额），**无需 LibreOffice** 即可知道正确数值，并自动按日期排序。所有脚本纯 `python3` + `openpyxl`/标准库，**跨平台（mac / linux / windows）**、不依赖系统专有命令。
 
 **三个可调默认**（用户一句话即可改）：**自主程度**（默认*拿不准才问*）· **身份信息**（默认*第一次问、存 `身份信息.json`、复用*）· **多币种**（默认*换算成 RMB；没给汇率就问，不要拍脑袋*）。
 
@@ -164,7 +175,9 @@ python3 scripts/recalc_fallback.py <工作区>/<名称>_已填写.xlsx --write  
 - **外币** → 换算成 RMB 并注明汇率/来源；没有汇率就**问用户**。
 - **疑似私人 / 与本次无关** → 先 `待核实/`、确认后 `无关/`；默认不计入、列存疑。
 - **替票绝不把 `无票` 变 `有票`**，也不计入任何合计。
-- **按时间顺序**填表（模板要求）。
+- **包年/连续包年 → 按月摊销**（年费 ÷ 12）：按月报销时只报当月那份；忘报的往月可一并补上。
+- **没有模板也能用**——`make_default_table.py` 生成通用费用明细表；工作区自动取**有含义的名字**建在源旁边；全程**跨平台**。
+- **按时间顺序**填表。
 
 ### 📦 安装
 **A. 直接拷贝技能目录（Claude Code / 多数 Agent 运行时）：**
@@ -187,10 +200,11 @@ expense-reimbursement-skill/
 │   │   ├── 归类与命名规范.md       # buckets, naming, no-double-count, 改签/退票, 替票, 疑似私人
 │   │   └── 额外说明写法.md         # finance-facing note templates (合并/退票/改签/外币/拆分)
 │   └── scripts/
-│       ├── setup_workspace.py    # build the 10 folders + back up originals
+│       ├── setup_workspace.py    # build the 10 folders + back up originals (--out/--template optional)
 │       ├── extract_ofd.py        # extract text from OFD national e-invoices
 │       ├── fill_template.py      # fill the template copy, chronological, self-check computed totals
-│       └── recalc_fallback.py    # pure-python recalc (no LibreOffice needed)
+│       ├── recalc_fallback.py    # pure-python recalc (no LibreOffice needed)
+│       └── make_default_table.py # generate a default 费用明细表 (xlsx+md) when the user has no template
 ├── pack.sh                       # build dist/expense-reimbursement.skill
 ├── LICENSE                       # Apache-2.0
 └── README.md

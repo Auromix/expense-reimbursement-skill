@@ -38,10 +38,12 @@ description: "把一堆杂乱的报销材料整理成可直接提交财务的费
 
 ### 第 0 步：搭工作区 + 备份(脚本)
 ```bash
-python3 scripts/setup_workspace.py --source <原始材料文件夹> --out <工作区根目录> --template <报销模板.xlsx>
+python3 scripts/setup_workspace.py --source <原始材料文件夹> [--out <工作区根目录>] [--template <报销模板.xlsx>]
 ```
-它会：建十个子文件夹(有票/无票/辅助材料/待核实/替票/额外说明/过程文件/备份/补充材料/无关)、把原始材料全量备份进 `备份/`(模板本身和 `*.skill` 不当作材料、会被自动跳过)、把模板原件存进 `备份/_模板原件/` 并在工作区生成一份 `<原名>_已填写.xlsx`(后续唯一可写的回填对象)、生成 `过程文件/manifest.json`。
-工作区必须建在原始材料文件夹**之外**。stdout 会回传各关键路径，记下 `writable_template`。
+- **`--out` 可不给**：默认在**原始材料文件夹旁边**(其父目录＝默认位置)新建一个**有具体含义**的工作区 `<原文件夹名>_报销整理_<YYYYMMDD>`；也可用 `--out` 指定到用户要的目录。
+- **`--template` 可不给**：不同用户的模板可能不一样、甚至没有。没模板就走"无模板"分支(见第 6 步)，最后用 `make_default_table.py` 生成一份通用费用明细表。
+它会：建十个子文件夹(有票/无票/辅助材料/待核实/替票/额外说明/过程文件/备份/补充材料/无关)、把原始材料全量备份进 `备份/`(模板本身和 `*.skill` 不当作材料、会被自动跳过)、有模板时把模板原件存进 `备份/_模板原件/` 并生成可写副本 `<原名>_已填写.xlsx`、生成 `过程文件/manifest.json`。
+工作区建在原始材料文件夹**之外**。stdout 回传各关键路径(`workspace`/`writable_template`，无模板时 `writable_template` 为 null)。所有脚本均纯 `python3`、**跨平台(mac/linux/windows 通用)**，不依赖系统专有命令。
 
 ### 第 1 步：逐份读取与理解材料
 按 `manifest.json` 顺序逐份读，按类型选读法：
@@ -96,6 +98,12 @@ python3 /mnt/skills/public/xlsx/scripts/recalc.py <writable_template>
 python3 scripts/recalc_fallback.py <writable_template> --write
 ```
 **必须**确认 `total_errors` 为 0，且重算结果与 `fill_template` 的 `computed`、与台账加总三者一致。
+
+**无模板分支**：用户没有模板时，跳过 `fill_template.py`/`recalc`，改用脚本生成一份通用费用明细表(直接写好数值与合计，并附 .md 预览)：
+```bash
+python3 scripts/make_default_table.py --ledger 过程文件/ledger.json --out <工作区>/<有含义的名字>.xlsx
+```
+此时 `ledger.json` 用"无模板版"结构(见 `make_default_table.py` 顶部注释：identity 可含标题/报销人/部门等，items 每条给 日期/类别/事由/商户/币种/原金额/汇率/金额(RMB)/备注)。生成的 xlsx 总额应与台账加总一致。
 
 ### 第 7 步：审阅报告 + 交付
 在工作区根目录写 `审阅报告.md`：
