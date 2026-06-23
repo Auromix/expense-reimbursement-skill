@@ -93,7 +93,7 @@ python3 scripts/make_default_table.py --ledger <workspace>/过程文件/ledger.j
 - **替票 never converts 无票 into 有票** and is never added to the totals.
 - **Annual (包年) subscriptions → prorate monthly** (annual ÷ 12) when reimbursed monthly; a forgotten earlier month can be back‑filled.
 - **No template? No problem** — `make_default_table.py` emits a generic 费用明细表; workspaces get **meaningful auto‑names** next to the source; everything is **cross‑platform**.
-- **Windows‑safe output** — `finalize_encoding.py` saves all `.txt/.md/.csv` as **UTF‑8 with BOM** and normalizes filenames to **NFC**, so titles & Chinese don't turn into 乱码 in Notepad/Excel (JSON stays plain UTF‑8; xlsx is fine).
+- **Opens on macOS / Windows / Linux** — `finalize_encoding.py` saves all `.txt/.md/.csv` as **UTF‑8 with BOM + CRLF** and normalizes filenames to **NFC**, so titles & Chinese never turn into 乱码 (or one giant line) in Notepad/Excel/TextEdit/gedit/LibreOffice. JSON stays plain UTF‑8 (so it still parses); `.xlsx` is portable OOXML (Excel / LibreOffice / Numbers / WPS).
 - **Chronological order** — rows go in date order.
 
 ### 📦 Install
@@ -178,7 +178,7 @@ python3 scripts/make_default_table.py --ledger <工作区>/过程文件/ledger.j
 - **替票绝不把 `无票` 变 `有票`**，也不计入任何合计。
 - **包年/连续包年 → 按月摊销**（年费 ÷ 12）：按月报销时只报当月那份；忘报的往月可一并补上。
 - **没有模板也能用**——`make_default_table.py` 生成通用费用明细表；工作区自动取**有含义的名字**建在源旁边；全程**跨平台**。
-- **Windows 不乱码**——`finalize_encoding.py` 把所有 `.txt/.md/.csv` 存成 **UTF‑8 带 BOM**、文件名规范成 **NFC**，记事本/Excel 打开标题与中文都正常（JSON 保持纯 UTF‑8；xlsx 本就没问题）。
+- **mac / Windows / Linux 都能打开**——`finalize_encoding.py` 把所有 `.txt/.md/.csv` 存成 **UTF‑8 带 BOM + CRLF**、文件名规范成 **NFC**，记事本/Excel/TextEdit/gedit/LibreOffice 打开标题与中文都正常、不乱码也不挤成一行（JSON 保持纯 UTF‑8 才能解析；xlsx 为通用 OOXML，Excel/LibreOffice/Numbers/WPS 通吃）。
 - **按时间顺序**填表。
 
 ### 📦 安装
