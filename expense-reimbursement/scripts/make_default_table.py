@@ -116,7 +116,8 @@ def main():
                str(num(it.get("金额")) or ""), str(it.get("备注", "") or "")]
         lines.append("| " + " | ".join(s.replace("|", "/") for s in row) + " |")
     lines.append("| | | | **合计** | | | | | **%.2f** | |" % total)
-    with open(md_path, "w", encoding="utf-8") as f:
+    # 用 UTF-8 带 BOM 写 md, 保证 Windows 记事本/Excel 打开标题与中文不乱码。
+    with open(md_path, "w", encoding="utf-8-sig") as f:
         f.write("\n".join(lines) + "\n")
 
     print(json.dumps({

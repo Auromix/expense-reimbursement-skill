@@ -93,6 +93,7 @@ python3 scripts/make_default_table.py --ledger <workspace>/过程文件/ledger.j
 - **替票 never converts 无票 into 有票** and is never added to the totals.
 - **Annual (包年) subscriptions → prorate monthly** (annual ÷ 12) when reimbursed monthly; a forgotten earlier month can be back‑filled.
 - **No template? No problem** — `make_default_table.py` emits a generic 费用明细表; workspaces get **meaningful auto‑names** next to the source; everything is **cross‑platform**.
+- **Windows‑safe output** — `finalize_encoding.py` saves all `.txt/.md/.csv` as **UTF‑8 with BOM** and normalizes filenames to **NFC**, so titles & Chinese don't turn into 乱码 in Notepad/Excel (JSON stays plain UTF‑8; xlsx is fine).
 - **Chronological order** — rows go in date order.
 
 ### 📦 Install
@@ -177,6 +178,7 @@ python3 scripts/make_default_table.py --ledger <工作区>/过程文件/ledger.j
 - **替票绝不把 `无票` 变 `有票`**，也不计入任何合计。
 - **包年/连续包年 → 按月摊销**（年费 ÷ 12）：按月报销时只报当月那份；忘报的往月可一并补上。
 - **没有模板也能用**——`make_default_table.py` 生成通用费用明细表；工作区自动取**有含义的名字**建在源旁边；全程**跨平台**。
+- **Windows 不乱码**——`finalize_encoding.py` 把所有 `.txt/.md/.csv` 存成 **UTF‑8 带 BOM**、文件名规范成 **NFC**，记事本/Excel 打开标题与中文都正常（JSON 保持纯 UTF‑8；xlsx 本就没问题）。
 - **按时间顺序**填表。
 
 ### 📦 安装
@@ -204,7 +206,8 @@ expense-reimbursement-skill/
 │       ├── extract_ofd.py        # extract text from OFD national e-invoices
 │       ├── fill_template.py      # fill the template copy, chronological, self-check computed totals
 │       ├── recalc_fallback.py    # pure-python recalc (no LibreOffice needed)
-│       └── make_default_table.py # generate a default 费用明细表 (xlsx+md) when the user has no template
+│       ├── make_default_table.py # generate a default 费用明细表 (xlsx+md) when the user has no template
+│       └── finalize_encoding.py  # Windows-safe pass: txt/md/csv -> UTF-8 BOM, filenames -> NFC
 ├── pack.sh                       # build dist/expense-reimbursement.skill
 ├── LICENSE                       # Apache-2.0
 └── README.md
