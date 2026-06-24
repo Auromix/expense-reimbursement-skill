@@ -80,7 +80,7 @@ python3 scripts/make_default_table.py --ledger <workspace>/过程文件/ledger.j
 | `补充材料/` | intake for later‑supplied materials → backed up & re‑classified, then **emptied** |
 | `无关/` | confirmed unrelated / not‑this‑period / next‑period; kept aside, excluded from this run |
 
-…plus `<name>_已填写.xlsx` (the filled table, rows in **chronological** order) and `审阅报告.md`.
+…plus `阅读说明.md` (a recipient‑facing guide: what's inside, what to read first, which folders are empty/ignorable), `<name>_已填写.xlsx` (the filled table, rows in **chronological** order), and `审阅报告.md`.
 
 ### 🧠 Correctness invariants (what makes the numbers right)
 - **One ledger row per event** — never sum an invoice together with its own payment screenshot.
@@ -165,7 +165,7 @@ python3 scripts/make_default_table.py --ledger <工作区>/过程文件/ledger.j
 | `补充材料/` | 客户后续补的材料入口 → 备份并归桶后**自动清空** |
 | `无关/` | 经确认与本次无关 / 本期不报 / 跨期；单独存放、不计入本期 |
 
-…外加 `<名称>_已填写.xlsx`（填好的明细表，**按时间顺序**）和 `审阅报告.md`。
+…外加 `阅读说明.md`（给收件人看：里面是什么、先看哪个、哪些空文件夹可忽略）、`<名称>_已填写.xlsx`（填好的明细表，**按时间顺序**）和 `审阅报告.md`。
 
 ### 🧠 正确性铁律（让金额算对的关键）
 - **一事件一行**——绝不把发票和它的支付截图算成两笔。
@@ -207,7 +207,8 @@ expense-reimbursement-skill/
 │       ├── fill_template.py      # fill the template copy, chronological, self-check computed totals
 │       ├── recalc_fallback.py    # pure-python recalc (no LibreOffice needed)
 │       ├── make_default_table.py # generate a default 费用明细表 (xlsx+md) when the user has no template
-│       └── finalize_encoding.py  # Windows-safe pass: txt/md/csv -> UTF-8 BOM, filenames -> NFC
+│       ├── make_package_readme.py# generate 阅读说明.md telling the recipient what's inside (empty folders flagged)
+│       └── finalize_encoding.py  # cross-platform pass: txt/md/csv -> UTF-8 BOM+CRLF, filenames -> NFC
 ├── pack.sh                       # build dist/expense-reimbursement.skill
 ├── LICENSE                       # Apache-2.0
 └── README.md
